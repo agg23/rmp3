@@ -32,15 +32,14 @@
 //! See individual documentation on [`Decoder`] and [`RawDecoder`] for more examples.
 
 #![deny(missing_docs)]
-
 #![cfg_attr(feature = "nightly-docs", feature(doc_cfg))]
 #![cfg_attr(not(feature = "std"), no_std)]
 
 #[doc(hidden)]
 pub mod ffi;
 
-use core::{marker::PhantomData, mem::{MaybeUninit}, num::NonZeroUsize, ptr};
-use libc::c_int;
+use core::ffi::c_int;
+use core::{marker::PhantomData, mem::MaybeUninit, num::NonZeroUsize, ptr};
 
 #[cfg(feature = "std")]
 use std::{rc::Rc, sync::Arc};
@@ -277,9 +276,7 @@ impl DecoderOwned<Vec<u8>> {
 
         // SAFETY: All functions decay all 'static to 'a as in `&'a self`,
         // and the `Vec` is not moved, reallocated, or dropped until the entire struct is.
-        let self_reference = unsafe {
-            std::mem::transmute::<_, &'static [u8]>(source.as_slice())
-        };
+        let self_reference = unsafe { std::mem::transmute::<_, &'static [u8]>(source.as_slice()) };
 
         Self {
             decoder: Decoder::new(self_reference),
